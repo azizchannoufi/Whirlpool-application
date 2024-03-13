@@ -1,0 +1,261 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema whirlpool
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema whirlpool
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `whirlpool` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `whirlpool` ;
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`PDV`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`PDV` (
+  `idPDV` INT NOT NULL,
+  `pdvname` VARCHAR(45) NULL,
+  `location` VARCHAR(45) NULL,
+  PRIMARY KEY (`idPDV`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Users`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Users` (
+  `idusers` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `lastname` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
+  `role` VARCHAR(45) NULL,
+  `PDV_idPDV` INT NOT NULL,
+  PRIMARY KEY (`idusers`),
+  INDEX `fk_Users_PDV_idx` (`PDV_idPDV` ASC) VISIBLE,
+  CONSTRAINT `fk_Users_PDV`
+    FOREIGN KEY (`PDV_idPDV`)
+    REFERENCES `whirlpool`.`PDV` (`idPDV`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Marque`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Marque` (
+  `idMarque` INT NOT NULL,
+  `marquename` VARCHAR(45) NULL,
+  PRIMARY KEY (`idMarque`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Category` (
+  `idCategory` INT NOT NULL,
+  `Categoryname` VARCHAR(45) NULL,
+  PRIMARY KEY (`idCategory`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Reference`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Reference` (
+  `idReference` INT NOT NULL,
+  `Referencename` VARCHAR(45) NULL,
+  `Marque_idMarque` INT NOT NULL,
+  `Category_idCategory` INT NOT NULL,
+  PRIMARY KEY (`idReference`),
+  INDEX `fk_Reference_Marque1_idx` (`Marque_idMarque` ASC) VISIBLE,
+  INDEX `fk_Reference_Category1_idx` (`Category_idCategory` ASC) VISIBLE,
+  CONSTRAINT `fk_Reference_Marque1`
+    FOREIGN KEY (`Marque_idMarque`)
+    REFERENCES `whirlpool`.`Marque` (`idMarque`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Reference_Category1`
+    FOREIGN KEY (`Category_idCategory`)
+    REFERENCES `whirlpool`.`Category` (`idCategory`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Article`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Article` (
+  `idArticle` INT NOT NULL,
+  `coloeur` VARCHAR(45) NULL,
+  `typeC` VARCHAR(45) NULL,
+  `capacite` FLOAT NULL,
+  `prix` INT NULL,
+  `Reference_idReference` INT NOT NULL,
+  PRIMARY KEY (`idArticle`),
+  INDEX `fk_Article_Reference1_idx` (`Reference_idReference` ASC) VISIBLE,
+  CONSTRAINT `fk_Article_Reference1`
+    FOREIGN KEY (`Reference_idReference`)
+    REFERENCES `whirlpool`.`Reference` (`idReference`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Exposition`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Exposition` (
+  `idExpo` INT NOT NULL,
+  `dateCr` DATE NULL,
+  `Article_idArticle` INT NOT NULL,
+  `PDV_idPDV` INT NOT NULL,
+  PRIMARY KEY (`idExpo`),
+  INDEX `fk_Exposition_Article1_idx` (`Article_idArticle` ASC) VISIBLE,
+  INDEX `fk_Exposition_PDV1_idx` (`PDV_idPDV` ASC) VISIBLE,
+  CONSTRAINT `fk_Exposition_Article1`
+    FOREIGN KEY (`Article_idArticle`)
+    REFERENCES `whirlpool`.`Article` (`idArticle`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Exposition_PDV1`
+    FOREIGN KEY (`PDV_idPDV`)
+    REFERENCES `whirlpool`.`PDV` (`idPDV`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`PriceM`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`PriceM` (
+  `idPriceM` INT NOT NULL,
+  `dateC` DATE NULL,
+  `PDV_idPDV` INT NOT NULL,
+  PRIMARY KEY (`idPriceM`),
+  INDEX `fk_PriceM_PDV1_idx` (`PDV_idPDV` ASC) VISIBLE,
+  CONSTRAINT `fk_PriceM_PDV1`
+    FOREIGN KEY (`PDV_idPDV`)
+    REFERENCES `whirlpool`.`PDV` (`idPDV`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Sellout`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Sellout` (
+  `idSellout` INT NOT NULL,
+  `dateCr` VARCHAR(45) NULL,
+  `nbrV` INT NULL,
+  `objectif` VARCHAR(45) NULL,
+  PRIMARY KEY (`idSellout`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Presence`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Presence` (
+  `idPresence` INT NOT NULL,
+  `datePr` DATE NULL,
+  `checkin` VARCHAR(45) NULL,
+  `checkout` VARCHAR(45) NULL,
+  `position` VARCHAR(45) NULL,
+  `Users_idusers` INT NOT NULL,
+  `PDV_idPDV` INT NOT NULL,
+  PRIMARY KEY (`idPresence`),
+  INDEX `fk_Presence_Users1_idx` (`Users_idusers` ASC) VISIBLE,
+  INDEX `fk_Presence_PDV1_idx` (`PDV_idPDV` ASC) VISIBLE,
+  CONSTRAINT `fk_Presence_Users1`
+    FOREIGN KEY (`Users_idusers`)
+    REFERENCES `whirlpool`.`Users` (`idusers`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Presence_PDV1`
+    FOREIGN KEY (`PDV_idPDV`)
+    REFERENCES `whirlpool`.`PDV` (`idPDV`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Log`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Log` (
+  `idLog` INT NOT NULL,
+  `messageAc` VARCHAR(45) NULL,
+  `dateAc` VARCHAR(45) NULL,
+  `TimeAc` VARCHAR(45) NULL,
+  `Presence_idPresence` INT NOT NULL,
+  PRIMARY KEY (`idLog`),
+  INDEX `fk_Log_Presence1_idx` (`Presence_idPresence` ASC) VISIBLE,
+  CONSTRAINT `fk_Log_Presence1`
+    FOREIGN KEY (`Presence_idPresence`)
+    REFERENCES `whirlpool`.`Presence` (`idPresence`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`PriceM_Category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`PriceM_Category` (
+  `idPriceM` INT NOT NULL,
+  `idCategory` INT NOT NULL,
+  PRIMARY KEY (`idPriceM`, `idCategory`),
+  INDEX `fk_PriceM_has_Category_Category1_idx` (`idCategory` ASC) VISIBLE,
+  INDEX `fk_PriceM_has_Category_PriceM1_idx` (`idPriceM` ASC) VISIBLE,
+  CONSTRAINT `fk_PriceM_has_Category_PriceM1`
+    FOREIGN KEY (`idPriceM`)
+    REFERENCES `whirlpool`.`PriceM` (`idPriceM`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_PriceM_has_Category_Category1`
+    FOREIGN KEY (`idCategory`)
+    REFERENCES `whirlpool`.`Category` (`idCategory`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `whirlpool`.`Reference_has_Sellout`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `whirlpool`.`Reference_has_Sellout` (
+  `Reference_idReference` INT NOT NULL,
+  `Sellout_idSellout` INT NOT NULL,
+  PRIMARY KEY (`Reference_idReference`, `Sellout_idSellout`),
+  INDEX `fk_Reference_has_Sellout_Sellout1_idx` (`Sellout_idSellout` ASC) VISIBLE,
+  INDEX `fk_Reference_has_Sellout_Reference1_idx` (`Reference_idReference` ASC) VISIBLE,
+  CONSTRAINT `fk_Reference_has_Sellout_Reference1`
+    FOREIGN KEY (`Reference_idReference`)
+    REFERENCES `whirlpool`.`Reference` (`idReference`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Reference_has_Sellout_Sellout1`
+    FOREIGN KEY (`Sellout_idSellout`)
+    REFERENCES `whirlpool`.`Sellout` (`idSellout`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
